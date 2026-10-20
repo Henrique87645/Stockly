@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Stockly.Views.ClientePage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="White">
+
+    <Grid RowDefinitions="Auto, *" Padding="30">
+
+        <!-- ================= CABEÇALHO (HEADER) ================= -->
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="0,0,0,30">
+            <!-- Título e Logo -->
+            <HorizontalStackLayout Grid.Column="0" Spacing="15" VerticalOptions="Center">
+                <Label Text="Stockly" FontSize="28" FontAttributes="Bold" TextColor="DarkBlue" />
+                <Label Text="|" FontSize="24" TextColor="Gray" />
+                <Label Text="Catálogo de Produtos" FontSize="20" TextColor="#0E2356" VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+
+            <!-- Usuário e Logout -->
+            <HorizontalStackLayout Grid.Column="1" Spacing="20" VerticalOptions="Center">
+                <Label Text="{Binding NomeUsuarioLogado, StringFormat='Olá, {0}'}" 
+                   FontSize="16" FontAttributes="Bold" TextColor="#0E2356" VerticalOptions="Center" />
+
+                <Button Text="Sair da Conta" 
+                    Command="{Binding SairCommand}" 
+                    BackgroundColor="Transparent" 
+                    TextColor="#D32F2F" 
+                    BorderColor="#D32F2F"
+                    BorderWidth="1"
+                    CornerRadius="8" 
+                    HeightRequest="40" 
+                    Padding="15,0" />
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- ================= CORPO DA PÁGINA ================= -->
+        <!-- Coluna Esquerda (Catálogo em Grid) | Coluna Direita (Ações e Histórico) -->
+        <Grid Grid.Row="1" ColumnDefinitions="7*, 3*" ColumnSpacing="30">
+
+            <!-- COLUNA ESQUERDA: Vitrine de Produtos -->
+            <Frame Grid.Column="0" BackgroundColor="White" BorderColor="LightGray" CornerRadius="12" Padding="25">
+                <Grid RowDefinitions="Auto, *">
+                    <Label Grid.Row="0" Text="Selecione um item abaixo" FontSize="22" FontAttributes="Bold" TextColor="Black" Margin="0,0,0,20"/>
+
+                    <CollectionView Grid.Row="1" ItemsSource="{Binding ListaProdutos}" SelectedItem="{Binding ProdutoSelecionado}" SelectionMode="Single">
+                        <!-- Usando GridItemsLayout para colocar 2 produtos lado a lado, estilo loja -->
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout Orientation="Vertical" Span="2" HorizontalItemSpacing="15" VerticalItemSpacing="15" />
+                        </CollectionView.ItemsLayout>
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame BorderColor="DarkBlue" BackgroundColor="#FAFAFA" CornerRadius="8" Padding="20">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup Name="CommonStates">
+                                            <!-- Quando selecionado, o fundo do card muda levemente para azul -->
+                                            <VisualState Name="Normal" />
+                                            <VisualState Name="Selected">
+                                                <VisualState.Setters>
+                                                    <Setter Property="BackgroundColor" Value="#EBF0FA" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+
+                                    <StackLayout Spacing="10">
+                                        <Label Text="{Binding Nome}" FontAttributes="Bold" FontSize="18" TextColor="Black" HorizontalOptions="Center"/>
+                                        <Label Text="{Binding Descricao}" FontSize="14" TextColor="#0E2356" HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+                                        <Label Text="{Binding Quantidade, StringFormat='Disponível: {0} un.'}" FontSize="14" TextColor="DarkBlue" FontAttributes="Bold" HorizontalOptions="Center" Margin="0,10,0,0"/>
+                                    </StackLayout>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Grid>
+            </Frame>
+
+            <!-- COLUNA DIREITA: Ação de Reserva e Histórico -->
+            <Grid Grid.Column="1" RowDefinitions="Auto, *" RowSpacing="30">
+
+                <!-- Bloco de Ação (Reserva) -->
+                <Frame Grid.Row="0" BackgroundColor="White" BorderColor="LightGray" CornerRadius="12" Padding="25">
+                    <StackLayout Spacing="15">
+                        <Label Text="Ação" FontSize="20" FontAttributes="Bold" TextColor="Black" />
+                        <Label Text="Selecione um produto no catálogo ao lado e clique abaixo para confirmar sua reserva." TextColor="Gray" FontSize="14"/>
+
+                        <Button Text="Confirmar Reserva" 
+                            FontAttributes="Bold" 
+                            FontSize="16" 
+                            TextColor="White" 
+                            BackgroundColor="DarkBlue" 
+                            CornerRadius="8" 
+                            HeightRequest="55" 
+                            Margin="0,10,0,0"
+                            Command="{Binding SelecionarProdutoCommand}" />
+                    </StackLayout>
+                </Frame>
+
+                <!-- Bloco de Histórico do Cliente -->
+                <Frame Grid.Row="1" BackgroundColor="White" BorderColor="LightGray" CornerRadius="12" Padding="20">
+                    <Grid RowDefinitions="Auto, *">
+                        <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="0,0,0,15">
+                            <Label Grid.Column="0" Text="Meu Histórico" FontSize="18" FontAttributes="Bold" TextColor="Black" VerticalOptions="Center"/>
+                            <ImageButton Grid.Column="1" Source="dotnet_bot.png" Command="{Binding VerMeuHistoricoCommand}" HeightRequest="25" WidthRequest="25" ToolTipProperties.Text="Atualizar" BackgroundColor="Transparent"/>
+                            <!-- Coloquei um botão simples de atualizar. Para melhor visualização, pode substituir por um ícone ou usar o texto abaixo -->
+                        </Grid>
+
+                        <Button Grid.Row="0" Grid.Column="1" Text="↻ Atualizar" Command="{Binding VerMeuHistoricoCommand}" BackgroundColor="Transparent" TextColor="DarkBlue" HorizontalOptions="End" FontAttributes="Bold"/>
+
+                        <CollectionView Grid.Row="1" ItemsSource="{Binding ListaHistorico}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackLayout Padding="10,15" Margin="0,0,0,5" BackgroundColor="#FAFAFA">
+                                        <Label Text="{Binding NomeProduto, StringFormat='🛒 {0}'}" FontAttributes="Bold" TextColor="Black"/>
+                                        <Label Text="{Binding DataHora, StringFormat='Reservado em: {0:dd/MM/yyyy HH:mm}'}" FontSize="12" TextColor="Gray" Margin="0,5,0,0"/>
+                                    </StackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </Grid>
+                </Frame>
+
+            </Grid>
+        </Grid>
+    </Grid>
+
+</ContentPage>
